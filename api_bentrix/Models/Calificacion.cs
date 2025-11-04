@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class Calificacion
     {

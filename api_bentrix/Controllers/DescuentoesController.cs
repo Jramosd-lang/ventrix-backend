@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using api_bentrix.Models;
+using api_ventrix.Models;
 using api_ventrix.Data;
 
 namespace api_ventrix.Controllers

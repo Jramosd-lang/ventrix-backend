@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class Vendedor : Persona
     {
-        
         public Negocio Negocio { get; set; }
 
         [Required(ErrorMessage = "El plan es obligatorio")]

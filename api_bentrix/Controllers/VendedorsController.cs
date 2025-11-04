@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using api_bentrix.Models;
+using api_ventrix.Models;
 using api_ventrix.Data;
 
 namespace api_ventrix.Controllers
@@ -25,7 +25,7 @@ namespace api_ventrix.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Vendedor>>> GetVendedores()
         {
-            return await _context.Vendedores.ToListAsync();
+            return await _context.Vendedores.Include(v => v.Negocio).ToListAsync();
         }
 
         // GET: api/Vendedors/5
@@ -49,10 +49,10 @@ namespace api_ventrix.Controllers
         }
 
 
-        [HttpPost("login")]
+        [HttpPost("login-vendedor")]
         public async Task<ActionResult<Vendedor>> loginVendedor(LoginRequest login)
         {
-            var vendedor = await _context.Vendedores
+            var vendedor = await _context.Vendedores.Include(v => v.Negocio)
                 .FirstOrDefaultAsync(v => v.Usuario == login.Usuario && v.Clave_Hasheada == login.Contraseña);
             if (vendedor == null)
             {
@@ -64,7 +64,7 @@ namespace api_ventrix.Controllers
         [HttpPut("cambiar-usuario")]
         public async Task<IActionResult> cambiarUsuario(string usuario, int id)
         {
-            var vendedor = await _context.Vendedores.FirstOrDefaultAsync(v => v.Id == id);
+            var vendedor = await _context.Vendedores.FirstOrDefaultAsync(v => v.id == id);
             if (vendedor == null)
             {
                 return NotFound();
@@ -80,7 +80,7 @@ namespace api_ventrix.Controllers
         [HttpPut("cambiar-contraseña")]
         public async Task<IActionResult> CambiarContraseña(string contraseña, int id)
         {
-            var vendedor = await _context.Vendedores.FirstOrDefaultAsync(v => v.Id == id);
+            var vendedor = await _context.Vendedores.FirstOrDefaultAsync(v => v.id == id);
 
             if (vendedor == null)
             {
@@ -101,7 +101,7 @@ namespace api_ventrix.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVendedor(int id, Vendedor vendedor)
         {
-            if (id != vendedor.Id)
+            if (id != vendedor.id)
             {
                 return BadRequest();
             }
@@ -135,7 +135,7 @@ namespace api_ventrix.Controllers
             _context.Vendedores.Add(vendedor);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVendedor", new { id = vendedor.Id }, vendedor);
+            return CreatedAtAction("GetVendedor", new { id = vendedor.id }, vendedor);
         }
 
         // DELETE: api/Vendedors/5
@@ -156,7 +156,7 @@ namespace api_ventrix.Controllers
 
         private bool VendedorExists(int id)
         {
-            return _context.Vendedores.Any(e => e.Id == id);
+            return _context.Vendedores.Any(e => e.id == id);
         }
     }
 }

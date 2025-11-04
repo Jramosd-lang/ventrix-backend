@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class Negocio
     {
-        public int Id { get; set; }
+        public int id { get; set; }
 
         [Required(ErrorMessage = "El nombre del negocio es obligatorio")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 100 caracteres")]
@@ -31,5 +33,7 @@ namespace api_bentrix.Models
         public List<string> Imagenes { get; set; } = new List<string>();
 
         public List<MetodoPago> Metodos_Pago { get; set; } = new List<MetodoPago>();
+
+        public int NegocioId { get; set; }
     }
 }

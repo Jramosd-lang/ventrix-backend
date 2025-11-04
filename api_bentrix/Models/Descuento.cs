@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class Descuento
     {

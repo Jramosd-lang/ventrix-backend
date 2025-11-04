@@ -12,8 +12,8 @@ using api_ventrix.Data;
 namespace api_ventrix.Migrations
 {
     [DbContext(typeof(ConeccionContext))]
-    [Migration("20251020121403_dos")]
-    partial class dos
+    [Migration("20251101042302_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,71 @@ namespace api_ventrix.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("api_bentrix.Models.Calificacion", b =>
+            modelBuilder.Entity("api_ventrix.Models.Administrador", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Clave_Hasheada")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Correo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Id_Negocio")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Nivel_Acceso")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Numero_Documento")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Tipo_Documento")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("Vendedorid")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("Id_Negocio");
+
+                    b.HasIndex("Vendedorid");
+
+                    b.ToTable("Administradores");
+                });
+
+            modelBuilder.Entity("api_ventrix.Models.Calificacion", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +116,7 @@ namespace api_ventrix.Migrations
                     b.ToTable("Calificaciones");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Carrito_Compras", b =>
+            modelBuilder.Entity("api_ventrix.Models.Descuento", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,42 +124,7 @@ namespace api_ventrix.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Direccion_Destino")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("Id_Negocio")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Total")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Valor_Envio")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id_Negocio");
-
-                    b.ToTable("CarritosCompras");
-                });
-
-            modelBuilder.Entity("api_bentrix.Models.Descuento", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("Carrito_ComprasId")
+                    b.Property<int?>("FacturaId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Fecha_Creacion")
@@ -126,12 +155,49 @@ namespace api_ventrix.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Carrito_ComprasId");
+                    b.HasIndex("FacturaId");
 
                     b.ToTable("Descuentos");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Impuesto", b =>
+            modelBuilder.Entity("api_ventrix.Models.Factura", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Id_comprador")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id_negocio")
+                        .HasColumnType("int");
+
+                    b.Property<int>("metodoPagoId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("subtotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("total")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("metodoPagoId");
+
+                    b.ToTable("Facturas");
+                });
+
+            modelBuilder.Entity("api_ventrix.Models.Impuesto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,7 +215,7 @@ namespace api_ventrix.Migrations
                     b.ToTable("Impuestos");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.ImpuestoDetalle", b =>
+            modelBuilder.Entity("api_ventrix.Models.ImpuestoDetalle", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -176,7 +242,7 @@ namespace api_ventrix.Migrations
                     b.ToTable("ImpuestoDetalle");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.MetodoPago", b =>
+            modelBuilder.Entity("api_ventrix.Models.MetodoPago", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -184,10 +250,7 @@ namespace api_ventrix.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CompradorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NegocioId")
+                    b.Property<int?>("Negocioid")
                         .HasColumnType("int");
 
                     b.Property<string>("Nombre")
@@ -203,27 +266,25 @@ namespace api_ventrix.Migrations
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VendedorId")
+                    b.Property<int?>("Vendedorid")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompradorId");
+                    b.HasIndex("Negocioid");
 
-                    b.HasIndex("NegocioId");
-
-                    b.HasIndex("VendedorId");
+                    b.HasIndex("Vendedorid");
 
                     b.ToTable("MetodosPago");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Negocio", b =>
+            modelBuilder.Entity("api_ventrix.Models.Negocio", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -239,6 +300,9 @@ namespace api_ventrix.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("NegocioId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -249,72 +313,12 @@ namespace api_ventrix.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
                     b.ToTable("Negocios");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Persona", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Apellido")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Clave_Hasheada")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Correo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Numero_Documento")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Telefono")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("Tipo_Documento")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Usuario")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Personas");
-
-                    b.HasDiscriminator().HasValue("Persona");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("api_bentrix.Models.Producto", b =>
+            modelBuilder.Entity("api_ventrix.Models.Producto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -323,9 +327,6 @@ namespace api_ventrix.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Calificacion")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Carrito_ComprasId")
                         .HasColumnType("int");
 
                     b.Property<string>("Codigo_Lote")
@@ -344,13 +345,20 @@ namespace api_ventrix.Migrations
                     b.Property<bool>("Estado")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("FacturaId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Fecha_Creacion")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Id_Negocio")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NegocioId")
+                    b.Property<string>("ImagenUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Negocioid")
                         .HasColumnType("int");
 
                     b.Property<string>("Nombre")
@@ -367,18 +375,18 @@ namespace api_ventrix.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Carrito_ComprasId");
-
                     b.HasIndex("DescuentoId");
+
+                    b.HasIndex("FacturaId");
 
                     b.HasIndex("Id_Negocio");
 
-                    b.HasIndex("NegocioId");
+                    b.HasIndex("Negocioid");
 
                     b.ToTable("Productos");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Reporte", b =>
+            modelBuilder.Entity("api_ventrix.Models.Reporte", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -405,65 +413,28 @@ namespace api_ventrix.Migrations
                     b.ToTable("Reportes");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Administrador", b =>
+            modelBuilder.Entity("api_ventrix.Models.Vendedor", b =>
                 {
-                    b.HasBaseType("api_bentrix.Models.Persona");
-
-                    b.Property<int>("Id_Negocio")
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Nivel_Acceso")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<int?>("VendedorId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("Id_Negocio");
-
-                    b.HasIndex("VendedorId");
-
-                    b.ToTable("Personas", t =>
-                        {
-                            t.Property("Id_Negocio")
-                                .HasColumnName("Administrador_Id_Negocio");
-                        });
-
-                    b.HasDiscriminator().HasValue("Administrador");
-                });
-
-            modelBuilder.Entity("api_bentrix.Models.Comprador", b =>
-                {
-                    b.HasBaseType("api_bentrix.Models.Persona");
-
-                    b.Property<int>("Carrito_ComprasId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Detalles")
+                    b.Property<string>("Apellido")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Direccion")
+                    b.Property<string>("Clave_Hasheada")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("Fecha_Registro")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Id_Negocio")
-                        .HasColumnType("int");
-
-                    b.HasIndex("Carrito_ComprasId");
-
-                    b.HasIndex("Id_Negocio");
-
-                    b.HasDiscriminator().HasValue("Comprador");
-                });
-
-            modelBuilder.Entity("api_bentrix.Models.Vendedor", b =>
-                {
-                    b.HasBaseType("api_bentrix.Models.Persona");
+                    b.Property<string>("Correo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("Fecha_Fin_Plan")
                         .HasColumnType("datetime2");
@@ -471,45 +442,85 @@ namespace api_ventrix.Migrations
                     b.Property<DateTime>("Fecha_Inicio_Plan")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("NegocioId")
+                    b.Property<int>("Negocioid")
                         .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Numero_Documento")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Plan")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasIndex("NegocioId");
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.HasDiscriminator().HasValue("Vendedor");
+                    b.Property<int>("Tipo_Documento")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("Negocioid");
+
+                    b.ToTable("Vendedores");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Carrito_Compras", b =>
+            modelBuilder.Entity("api_ventrix.Models.Administrador", b =>
                 {
-                    b.HasOne("api_bentrix.Models.Negocio", null)
+                    b.HasOne("api_ventrix.Models.Negocio", null)
                         .WithMany()
                         .HasForeignKey("Id_Negocio")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("api_ventrix.Models.Vendedor", null)
+                        .WithMany("Administradores")
+                        .HasForeignKey("Vendedorid");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Descuento", b =>
+            modelBuilder.Entity("api_ventrix.Models.Descuento", b =>
                 {
-                    b.HasOne("api_bentrix.Models.Carrito_Compras", null)
-                        .WithMany("Descuentos_Aplicados")
-                        .HasForeignKey("Carrito_ComprasId");
+                    b.HasOne("api_ventrix.Models.Factura", null)
+                        .WithMany("Descuentos_aplicados")
+                        .HasForeignKey("FacturaId");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Impuesto", b =>
+            modelBuilder.Entity("api_ventrix.Models.Factura", b =>
                 {
-                    b.HasOne("api_bentrix.Models.Producto", null)
+                    b.HasOne("api_ventrix.Models.MetodoPago", "metodoPago")
+                        .WithMany()
+                        .HasForeignKey("metodoPagoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("metodoPago");
+                });
+
+            modelBuilder.Entity("api_ventrix.Models.Impuesto", b =>
+                {
+                    b.HasOne("api_ventrix.Models.Producto", null)
                         .WithMany("Impuestos_Aplicados")
                         .HasForeignKey("ProductoId");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.ImpuestoDetalle", b =>
+            modelBuilder.Entity("api_ventrix.Models.ImpuestoDetalle", b =>
                 {
-                    b.HasOne("api_bentrix.Models.Impuesto", "Impuesto")
+                    b.HasOne("api_ventrix.Models.Impuesto", "Impuesto")
                         .WithMany("Impuestos")
                         .HasForeignKey("ImpuestoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -518,120 +529,79 @@ namespace api_ventrix.Migrations
                     b.Navigation("Impuesto");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.MetodoPago", b =>
+            modelBuilder.Entity("api_ventrix.Models.MetodoPago", b =>
                 {
-                    b.HasOne("api_bentrix.Models.Comprador", null)
-                        .WithMany("Metodos_De_Pago")
-                        .HasForeignKey("CompradorId");
-
-                    b.HasOne("api_bentrix.Models.Negocio", null)
+                    b.HasOne("api_ventrix.Models.Negocio", null)
                         .WithMany("Metodos_Pago")
-                        .HasForeignKey("NegocioId");
+                        .HasForeignKey("Negocioid");
 
-                    b.HasOne("api_bentrix.Models.Vendedor", null)
+                    b.HasOne("api_ventrix.Models.Vendedor", null)
                         .WithMany("Metodos_De_Pago")
-                        .HasForeignKey("VendedorId");
+                        .HasForeignKey("Vendedorid");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Producto", b =>
+            modelBuilder.Entity("api_ventrix.Models.Producto", b =>
                 {
-                    b.HasOne("api_bentrix.Models.Carrito_Compras", null)
-                        .WithMany("Productos")
-                        .HasForeignKey("Carrito_ComprasId");
-
-                    b.HasOne("api_bentrix.Models.Descuento", null)
+                    b.HasOne("api_ventrix.Models.Descuento", null)
                         .WithMany("Productos_Aplicados")
                         .HasForeignKey("DescuentoId");
 
-                    b.HasOne("api_bentrix.Models.Negocio", null)
-                        .WithMany()
-                        .HasForeignKey("Id_Negocio")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("api_bentrix.Models.Negocio", null)
+                    b.HasOne("api_ventrix.Models.Factura", null)
                         .WithMany("Productos")
-                        .HasForeignKey("NegocioId");
-                });
+                        .HasForeignKey("FacturaId");
 
-            modelBuilder.Entity("api_bentrix.Models.Administrador", b =>
-                {
-                    b.HasOne("api_bentrix.Models.Negocio", "Negocio")
+                    b.HasOne("api_ventrix.Models.Negocio", null)
                         .WithMany()
                         .HasForeignKey("Id_Negocio")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("api_bentrix.Models.Vendedor", null)
-                        .WithMany("Administradores")
-                        .HasForeignKey("VendedorId");
-
-                    b.Navigation("Negocio");
+                    b.HasOne("api_ventrix.Models.Negocio", null)
+                        .WithMany("Productos")
+                        .HasForeignKey("Negocioid");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Comprador", b =>
+            modelBuilder.Entity("api_ventrix.Models.Vendedor", b =>
                 {
-                    b.HasOne("api_bentrix.Models.Carrito_Compras", "Carrito_Compras")
+                    b.HasOne("api_ventrix.Models.Negocio", "Negocio")
                         .WithMany()
-                        .HasForeignKey("Carrito_ComprasId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api_bentrix.Models.Negocio", null)
-                        .WithMany()
-                        .HasForeignKey("Id_Negocio")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Carrito_Compras");
-                });
-
-            modelBuilder.Entity("api_bentrix.Models.Vendedor", b =>
-                {
-                    b.HasOne("api_bentrix.Models.Negocio", "Negocio")
-                        .WithMany()
-                        .HasForeignKey("NegocioId")
+                        .HasForeignKey("Negocioid")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Negocio");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Carrito_Compras", b =>
-                {
-                    b.Navigation("Descuentos_Aplicados");
-
-                    b.Navigation("Productos");
-                });
-
-            modelBuilder.Entity("api_bentrix.Models.Descuento", b =>
+            modelBuilder.Entity("api_ventrix.Models.Descuento", b =>
                 {
                     b.Navigation("Productos_Aplicados");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Impuesto", b =>
+            modelBuilder.Entity("api_ventrix.Models.Factura", b =>
+                {
+                    b.Navigation("Descuentos_aplicados");
+
+                    b.Navigation("Productos");
+                });
+
+            modelBuilder.Entity("api_ventrix.Models.Impuesto", b =>
                 {
                     b.Navigation("Impuestos");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Negocio", b =>
+            modelBuilder.Entity("api_ventrix.Models.Negocio", b =>
                 {
                     b.Navigation("Metodos_Pago");
 
                     b.Navigation("Productos");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Producto", b =>
+            modelBuilder.Entity("api_ventrix.Models.Producto", b =>
                 {
                     b.Navigation("Impuestos_Aplicados");
                 });
 
-            modelBuilder.Entity("api_bentrix.Models.Comprador", b =>
-                {
-                    b.Navigation("Metodos_De_Pago");
-                });
-
-            modelBuilder.Entity("api_bentrix.Models.Vendedor", b =>
+            modelBuilder.Entity("api_ventrix.Models.Vendedor", b =>
                 {
                     b.Navigation("Administradores");
 

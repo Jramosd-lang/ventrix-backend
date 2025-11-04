@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using api_bentrix.Models;
+using api_ventrix.Models;
 using api_ventrix.Data;
 
 namespace api_ventrix.Controllers
@@ -42,12 +42,29 @@ namespace api_ventrix.Controllers
             return comprador;
         }
 
+        [HttpPost("login-comprador")]
+        public async Task<ActionResult<Comprador>> loginComprador(LoginModel login)
+        {
+            var comprador = await _context.Compradores.FirstOrDefaultAsync(c => c.Usuario == login.Usuario && c.Clave_Hasheada == login.Contraseña);
+            if (comprador == null)
+            {
+                return NotFound();
+            }
+            return comprador;
+        }
+
+        public class LoginModel()
+        {
+            public string Usuario { get; set; }
+            public string Contraseña { get; set; }
+        }
+
         // PUT: api/Compradors/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutComprador(int id, Comprador comprador)
         {
-            if (id != comprador.Id)
+            if (id != comprador.id)
             {
                 return BadRequest();
             }
@@ -81,7 +98,7 @@ namespace api_ventrix.Controllers
             _context.Compradores.Add(comprador);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetComprador", new { id = comprador.Id }, comprador);
+            return CreatedAtAction("GetComprador", new { id = comprador.id }, comprador);
         }
 
         // DELETE: api/Compradors/5
@@ -102,7 +119,7 @@ namespace api_ventrix.Controllers
 
         private bool CompradorExists(int id)
         {
-            return _context.Compradores.Any(e => e.Id == id);
+            return _context.Compradores.Any(e => e.id == id);
         }
     }
 }

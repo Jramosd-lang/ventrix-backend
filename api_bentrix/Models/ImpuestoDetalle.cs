@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class ImpuestoDetalle
     {

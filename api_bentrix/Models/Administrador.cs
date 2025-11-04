@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class Administrador : Persona
     {
+
         [Required(ErrorMessage = "El ID del negocio es obligatorio")]
         [Range(1, int.MaxValue, ErrorMessage = "El ID del negocio debe ser mayor a 0")]
         [ForeignKey("Negocio")]
@@ -15,6 +16,5 @@ namespace api_bentrix.Models
         public int Nivel_Acceso { get; set; }
 
         // Relación con Negocio (opcional, según tu DbContext)
-        public virtual Negocio Negocio { get; set; }
     }
 }

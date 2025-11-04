@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class Persona
     {
-        public int Id { get; set; }
+        public int id { get; set; }
 
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres")]

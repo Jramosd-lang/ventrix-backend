@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using api_bentrix.Models;
+using api_ventrix.Models;
 using api_ventrix.Data;
 
 namespace api_ventrix.Controllers
@@ -47,7 +47,7 @@ namespace api_ventrix.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAdministrador(int id, Administrador administrador)
         {
-            if (id != administrador.Id)
+            if (id != administrador.id)
             {
                 return BadRequest();
             }
@@ -81,7 +81,7 @@ namespace api_ventrix.Controllers
             _context.Administradores.Add(administrador);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAdministrador", new { id = administrador.Id }, administrador);
+            return CreatedAtAction("GetAdministrador", new { id = administrador.id }, administrador);
         }
 
         // DELETE: api/Administradors/5
@@ -102,7 +102,7 @@ namespace api_ventrix.Controllers
 
         private bool AdministradorExists(int id)
         {
-            return _context.Administradores.Any(e => e.Id == id);
+            return _context.Administradores.Any(e => e.id == id);
         }
     }
 }

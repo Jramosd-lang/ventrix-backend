@@ -1,4 +1,4 @@
-namespace api_bentrix
+namespace api_ventrix
 {
     public class WeatherForecast
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class MetodoPago
     {
@@ -18,5 +18,7 @@ namespace api_bentrix.Models
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El proveedor debe tener entre 3 y 100 caracteres")]
         [RegularExpression(@"^[a-záéíóúñA-ZÁÉÍÓÚÑ0-9\s\.\-&]+$", ErrorMessage = "El proveedor contiene caracteres no permitidos")]
         public string Proveedor { get; set; } = string.Empty;
+        // 🔹 FK opcional hacia Comprador
+
     }
 }

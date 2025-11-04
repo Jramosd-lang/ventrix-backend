@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace api_bentrix.Models
+namespace api_ventrix.Models
 {
     public class Impuesto
     {

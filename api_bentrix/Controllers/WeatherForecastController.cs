@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace api_bentrix.Controllers;
+namespace api_ventrix.Controllers;
 
 [ApiController]
 [Route("[controller]")]

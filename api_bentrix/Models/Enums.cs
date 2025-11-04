@@ -1,4 +1,4 @@
-﻿namespace api_bentrix.Models
+﻿namespace api_ventrix.Models
 {
     public enum TipoDocumento
     {

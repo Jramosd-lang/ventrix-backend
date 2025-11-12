@@ -20,7 +20,8 @@ namespace api_ventrix.Data
         public DbSet<Calificacion> Calificaciones { get; set; }
         public DbSet<Reporte> Reportes { get; set; }
         public DbSet<Factura> Facturas { get; set; }
-        public DbSet<api_ventrix.Models.ImpuestoDetalle> ImpuestoDetalle { get; set; } = default!;
+        public DbSet<ImpuestoDetalle> ImpuestoDetalle { get; set; } = default!;
+        public DbSet<Pedido> Pedidos { get; set; }
 
 
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api_ventrix.Data;
 
@@ -11,9 +12,11 @@ using api_ventrix.Data;
 namespace api_ventrix.Migrations
 {
     [DbContext(typeof(ConeccionContext))]
-    partial class ConeccionContextModelSnapshot : ModelSnapshot
+    [Migration("20251107032202_pedido")]
+    partial class pedido
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -384,65 +387,6 @@ namespace api_ventrix.Migrations
                     b.ToTable("Negocios");
                 });
 
-            modelBuilder.Entity("api_ventrix.Models.Pedido", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Codigo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Direccion_Envio")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("Fecha_Creacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Fecha_Entrega")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Fecha_Envio")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Fecha_Pago")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Id_Comprador")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Id_Negocio")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Metodo_Pago")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observaciones")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("Total_Pagar")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id_Comprador");
-
-                    b.HasIndex("Id_Negocio");
-
-                    b.ToTable("Pedidos");
-                });
-
             modelBuilder.Entity("api_ventrix.Models.Producto", b =>
                 {
                     b.Property<int>("Id")
@@ -491,9 +435,6 @@ namespace api_ventrix.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("PedidoId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
@@ -510,8 +451,6 @@ namespace api_ventrix.Migrations
                     b.HasIndex("Id_Negocio");
 
                     b.HasIndex("Negocioid");
-
-                    b.HasIndex("PedidoId");
 
                     b.ToTable("Productos");
                 });
@@ -674,23 +613,6 @@ namespace api_ventrix.Migrations
                         .HasForeignKey("Vendedorid");
                 });
 
-            modelBuilder.Entity("api_ventrix.Models.Pedido", b =>
-                {
-                    b.HasOne("api_ventrix.Models.Comprador", "Comprador")
-                        .WithMany()
-                        .HasForeignKey("Id_Comprador");
-
-                    b.HasOne("api_ventrix.Models.Negocio", "Negocio")
-                        .WithMany()
-                        .HasForeignKey("Id_Negocio")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Comprador");
-
-                    b.Navigation("Negocio");
-                });
-
             modelBuilder.Entity("api_ventrix.Models.Producto", b =>
                 {
                     b.HasOne("api_ventrix.Models.Descuento", null)
@@ -710,10 +632,6 @@ namespace api_ventrix.Migrations
                     b.HasOne("api_ventrix.Models.Negocio", null)
                         .WithMany("Productos")
                         .HasForeignKey("Negocioid");
-
-                    b.HasOne("api_ventrix.Models.Pedido", null)
-                        .WithMany("Productos")
-                        .HasForeignKey("PedidoId");
                 });
 
             modelBuilder.Entity("api_ventrix.Models.Vendedor", b =>
@@ -753,11 +671,6 @@ namespace api_ventrix.Migrations
                 {
                     b.Navigation("Metodos_Pago");
 
-                    b.Navigation("Productos");
-                });
-
-            modelBuilder.Entity("api_ventrix.Models.Pedido", b =>
-                {
                     b.Navigation("Productos");
                 });
 

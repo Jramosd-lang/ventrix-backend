@@ -10,6 +10,7 @@ using api_ventrix.Data;
 using api_ventrix.Models;
 using Azure.Identity;
 using api_ventrix.Hubs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api_ventrix.Controllers
 {
@@ -24,13 +25,6 @@ namespace api_ventrix.Controllers
         {
             _context = context;
             _hubContext = hubContext;
-        }
-
-        // GET: api/Pedidoes
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pedido>>> GetPedidos()
-        {
-            return await _context.Pedidos.ToListAsync();
         }
 
         [HttpGet("negocio/{id}")]
@@ -49,8 +43,6 @@ namespace api_ventrix.Controllers
             return Ok(pedidos);
         }
 
-
-        // GET: api/Pedidoes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Pedido>> GetPedido(int id)
         {
@@ -64,8 +56,6 @@ namespace api_ventrix.Controllers
             return pedido;
         }
 
-        // PUT: api/Pedidoes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPedido(int id, Pedido pedido)
         {
@@ -153,6 +143,41 @@ namespace api_ventrix.Controllers
             _context.Pedidos.Remove(pedido);
             await _context.SaveChangesAsync();
 
+            return NoContent();
+        }
+
+        public class CambiarEstadoDTO
+        {
+            public int Id_Pedido { get; set; }
+            public string Nuevo_Estado { get; set; }
+        }
+
+        [Authorize(Roles = "vendedor")]
+        [HttpPut("cambiar-estado")]
+        public async Task<IActionResult> CambiarEstadoPedido(CambiarEstadoDTO cambiarEstado)
+        {
+            var pedido = await _context.Pedidos.FindAsync(cambiarEstado.Id_Pedido);
+            if (pedido == null)
+            {
+                return NotFound("Pedido no encontrado");
+            }
+            pedido.Estado = cambiarEstado.Nuevo_Estado;
+            _context.Entry(pedido).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PedidoExists(cambiarEstado.Id_Pedido))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
             return NoContent();
         }
 

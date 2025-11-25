@@ -14,23 +14,38 @@ namespace clase1_progweb.JWT
             _configuration = configuration;
         }
 
-        public string GenerateToken(string username, string role)
+        // NOTA: idNegocio es opcional
+        public string GenerateToken(string username, string role, int? idNegocio = null)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
+            var securityKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"])
+            );
+
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
+
+            var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, username),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.Role, role)
+    };
+
+            // Agregar id_negocio SOLO si aplica
+            if (role == "vendedor" && idNegocio != null)
             {
-                new Claim(JwtRegisteredClaimNames.Sub, username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, role)
-            };
+                claims.Add(new Claim("id_negocio", idNegocio.Value.ToString()));
+            }
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
                 expires: DateTime.Now.AddHours(1),
-                signingCredentials: credentials);
+                signingCredentials: credentials
+            );
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

@@ -16,7 +16,7 @@ namespace api_ventrix.Models
         public int? Id_Comprador { get; set; }
 
         [Required(ErrorMessage = "No se han agregado productos")]
-        public List<Producto> Productos { get; set; } = new List<Producto>();
+        public List<PedidoItem> PedidoItems { get; set; } = new List<PedidoItem>();
 
         [Required(ErrorMessage = "No se ha dado un valor total a pagar")]
         [Column(TypeName = "decimal(18,2)")]

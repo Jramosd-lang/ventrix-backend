@@ -86,7 +86,6 @@ namespace api_ventrix.Controllers
             return NoContent();
         }
         // GET: api/Negocios/5/productos
-        [Authorize(Roles = "vendedor")]
         [HttpGet("{id}/productos")]
         public async Task<ActionResult<IEnumerable<Producto>>> GetProductosDeNegocio(int id)
         {

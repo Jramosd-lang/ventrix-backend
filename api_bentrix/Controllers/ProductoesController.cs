@@ -51,6 +51,7 @@ namespace api_ventrix.Controllers
         }
 
         // PUT: api/Productos/5
+        [Authorize(Roles = "vendedor")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProducto(int id, Producto producto)
         {

@@ -23,6 +23,7 @@ namespace api_ventrix.Data
         public DbSet<ImpuestoDetalle> ImpuestoDetalle { get; set; } = default!;
         public DbSet<Pedido> Pedidos { get; set; }
 
+        public DbSet<PedidoItem> pedidoItems { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

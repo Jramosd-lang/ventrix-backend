@@ -23,34 +23,12 @@ namespace api_ventrix.Controllers
             _jwtTokenGenerator = jwtTokenGenerator;
         }
 
-        // GET: api/Vendedors (público)
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Vendedor>>> GetVendedores()
-        {
-            return await _context.Vendedores.Include(v => v.Negocio).ToListAsync();
-        }
-
-        // GET: api/Vendedors/5 (público)
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Vendedor>> GetVendedor(int id)
-        {
-            var vendedor = await _context.Vendedores.FindAsync(id);
-
-            if (vendedor == null)
-            {
-                return NotFound();
-            }
-
-            return vendedor;
-        }
-
         public class LoginRequest
         {
             public string Usuario { get; set; }
             public string Contraseña { get; set; }
         }
 
-        // LOGIN (público)
         [HttpPost("login-vendedor")]
         public async Task<ActionResult> loginVendedor(LoginRequest login)
 
@@ -63,7 +41,7 @@ namespace api_ventrix.Controllers
                 return BadRequest("credenciales incorrectas");
             }
 
-            var token = _jwtTokenGenerator.GenerateToken(login.Usuario, "vendedor");
+            var token = _jwtTokenGenerator.GenerateToken(login.Usuario, "vendedor", vendedor.Negocio.id);
             if (vendedor.Negocio == null)
             {
                 // Opciones: devolver un error claro o enviar id_negocio nulo

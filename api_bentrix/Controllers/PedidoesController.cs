@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.SignalR;
-using api_ventrix.Data;
-using api_ventrix.Models;
-using Azure.Identity;
+﻿using api_ventrix.Data;
 using api_ventrix.Hubs;
+using api_ventrix.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace api_ventrix.Controllers
 {
@@ -27,125 +21,115 @@ namespace api_ventrix.Controllers
             _hubContext = hubContext;
         }
 
-        [HttpGet("negocio/{id}")]
-        public async Task<ActionResult<IEnumerable<Pedido>>> GetPedidosPorNegocio(int id)
+        // ================================
+        // OBTENER PEDIDOS POR NEGOCIO
+        // ================================
+        [Authorize(Roles = "vendedor")]
+        [HttpGet("negocio")]
+        public async Task<ActionResult<IEnumerable<Pedido>>> GetPedidosPorNegocio()
         {
+            var idNegocioClaim = User.FindFirst("id_negocio")?.Value;
+            if (idNegocioClaim == null)
+                return Unauthorized("El token no contiene id_negocio.");
+
+            int idNegocio = int.Parse(idNegocioClaim);
+
             var pedidos = await _context.Pedidos
-                .Where(p => p.Id_Negocio == id)
-                .OrderBy(p => p.Id) 
-                .Include(p => p.Productos) 
-                .Include(p => p.Comprador) 
+                .Where(p => p.Id_Negocio == idNegocio)
+                .Include(p => p.PedidoItems)
+                    .ThenInclude(i => i.Producto)
+                .Include(p => p.Comprador)
+                .OrderBy(p => p.Id)
                 .ToListAsync();
 
-            if (!pedidos.Any()) 
-                return NotFound($"No se encontraron pedidos para el negocio con ID {id}");
+            if (!pedidos.Any())
+                return NotFound("No se encontraron pedidos para tu negocio.");
 
             return Ok(pedidos);
         }
 
+        // ================================
+        // OBTENER PEDIDO POR ID
+        // ================================
         [HttpGet("{id}")]
         public async Task<ActionResult<Pedido>> GetPedido(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
+            var pedido = await _context.Pedidos
+                .Include(p => p.PedidoItems)
+                    .ThenInclude(i => i.Producto)
+                .Include(p => p.Comprador)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (pedido == null)
-            {
                 return NotFound();
-            }
 
             return pedido;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPedido(int id, Pedido pedido)
-        {
-            if (id != pedido.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(pedido).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PedidoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Pedidoes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // ================================
+        // CREAR PEDIDO
+        // ================================
         [HttpPost]
-        public async Task<ActionResult<Pedido>> PostPedido(PedidoDTO pedido)
+        public async Task<ActionResult<Pedido>> PostPedido(PedidoDTO dto)
         {
-            var negocio = await _context.Negocios.FirstOrDefaultAsync(n => n.id == pedido.Id_Negocio);
-            var comprador = await _context.Compradores.FirstOrDefaultAsync(c => c.id == pedido.Id_Comprador);
-
+            var negocio = await _context.Negocios.FindAsync(dto.Id_Negocio);
             if (negocio == null) return NotFound("No se encontró negocio");
-            if (pedido.Id_Comprador.HasValue && comprador == null) return NotFound("No se encontró comprador");
+
+            Comprador comprador = null;
+            if (dto.Id_Comprador.HasValue)
+            {
+                comprador = await _context.Compradores.FindAsync(dto.Id_Comprador.Value);
+                if (comprador == null) return NotFound("No se encontró comprador");
+            }
 
             var productos = await _context.Productos
-                .Where(p => pedido.Ids_Productos.Contains(p.Id))
+                .Where(p => dto.Ids_Productos.Contains(p.Id))
                 .ToListAsync();
 
-            var idsNoEncontrados = pedido.Ids_Productos.Except(productos.Select(p => p.Id)).ToList();
-            if (idsNoEncontrados.Any()) return BadRequest($"Productos no existen: {string.Join(", ", idsNoEncontrados)}");
+            var idsNoEncontrados = dto.Ids_Productos.Except(productos.Select(p => p.Id)).ToList();
+            if (idsNoEncontrados.Any())
+                return BadRequest($"Productos no existen: {string.Join(", ", idsNoEncontrados)}");
 
-            var pedido_ = new Pedido
+            // Crear el pedido
+            var pedido = new Pedido
             {
-                Id_Negocio = negocio.id,
-                Id_Comprador = comprador?.id,
-                Productos = productos,
-                Total_Pagar = pedido.Total_Pagar,
-                Metodo_Pago = pedido.Metodo_Pago,
-                Estado = pedido.Estado ?? "Pendiente",
-                Direccion_Envio = pedido.Direccion_Envio,
-                Observaciones = pedido.Observaciones,
-                Negocio = negocio,
-                Comprador = comprador
+                Id_Negocio = dto.Id_Negocio,
+                Id_Comprador = dto.Id_Comprador,
+                Total_Pagar = dto.Total_Pagar,
+                Metodo_Pago = dto.Metodo_Pago,
+                Estado = dto.Estado,
+                Direccion_Envio = dto.Direccion_Envio,
+                Observaciones = dto.Observaciones,
+                Fecha_Creacion = dto.Fecha_Creacion
             };
 
-            _context.Pedidos.Add(pedido_);
-            await _context.SaveChangesAsync();
-
-            // ---- EMITIR A TODOS con el nombre que escucha el frontend ----
-            await _hubContext.Clients.All.SendAsync("PedidoRecibido", pedido_);
-
-            Console.WriteLine($"Controller: emitido PedidoRecibido para pedido id={pedido_.Id}");
-
-            return CreatedAtAction("GetPedido", new { id = pedido_.Id }, pedido_);
-        }
-
-
-
-        // DELETE: api/Pedidoes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePedido(int id)
-        {
-            var pedido = await _context.Pedidos.FindAsync(id);
-            if (pedido == null)
+            // Crear los PedidoItems
+            foreach (var prod in productos)
             {
-                return NotFound();
+                var item = new PedidoItem
+                {
+                    Id_Producto = prod.Id,
+                    Valor = prod.Valor, // Copiar el precio actual
+                    Cantidad = 1,
+                    ImagenUrl = prod.ImagenUrl,
+                    Id_Negocio = dto.Id_Negocio
+                };
+
+                pedido.PedidoItems.Add(item);
             }
 
-            _context.Pedidos.Remove(pedido);
+            _context.Pedidos.Add(pedido);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            // Emitir evento por SignalR
+            await _hubContext.Clients.All.SendAsync("PedidoRecibido", pedido);
+
+            return CreatedAtAction("GetPedido", new { id = pedido.Id }, pedido);
         }
 
+        // ================================
+        // MODIFICAR ESTADO
+        // ================================
         public class CambiarEstadoDTO
         {
             public int Id_Pedido { get; set; }
@@ -154,36 +138,36 @@ namespace api_ventrix.Controllers
 
         [Authorize(Roles = "vendedor")]
         [HttpPut("cambiar-estado")]
-        public async Task<IActionResult> CambiarEstadoPedido(CambiarEstadoDTO cambiarEstado)
+        public async Task<IActionResult> CambiarEstadoPedido(CambiarEstadoDTO dto)
         {
-            var pedido = await _context.Pedidos.FindAsync(cambiarEstado.Id_Pedido);
+            var pedido = await _context.Pedidos.FindAsync(dto.Id_Pedido);
             if (pedido == null)
-            {
                 return NotFound("Pedido no encontrado");
-            }
-            pedido.Estado = cambiarEstado.Nuevo_Estado;
-            _context.Entry(pedido).State = EntityState.Modified;
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PedidoExists(cambiarEstado.Id_Pedido))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            pedido.Estado = dto.Nuevo_Estado;
+
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        private bool PedidoExists(int id)
+        // ================================
+        // ELIMINAR PEDIDO
+        // ================================
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePedido(int id)
         {
-            return _context.Pedidos.Any(e => e.Id == id);
+            var pedido = await _context.Pedidos
+                .Include(p => p.PedidoItems)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pedido == null)
+                return NotFound();
+
+            _context.pedidoItems.RemoveRange(pedido.PedidoItems);
+            _context.Pedidos.Remove(pedido);
+
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
